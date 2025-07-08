@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obesity Prediction Form</title>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background-color: #f0f4f8;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #34495e;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.25);
+        }
+
+        .progress-container {
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e0e0e0;
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .progress-step {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .progress-label {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 0.5rem;
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            margin: 0 0.5rem;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #prev-btn {
+            background-color: #34495e;
+        }
+
+        #next-btn {
+            background-color: #2ecc71;
+        }
+
+        #submit-btn {
+            background-color: #3498db;
+        }
+
+        @media (max-width: 480px) {
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                margin: 0.5rem 0;
+            }
+        }
+
+        #summary-content {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        #summary-content h3 {
+            color: #2c3e50;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 10px;
+        }
+
+        #summary-content ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #summary-content li {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #summary-content strong {
+            color: #34495e;
+        }
+
+        #prediction-result {
+            display: none;
+            background-color: #e8f6f3;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        #prediction-result h3 {
+            color: #27ae60;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 10px;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <h1>Obesity Prediction Form</h1>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-step active">1</div>
+                <div class="progress-step">2</div>
+                <div class="progress-step">3</div>
+                <div class="progress-step">4</div>
+            </div>
+            <div class="progress-labels">
+                <div class="progress-label">Personal</div>
+                <div class="progress-label">Lifestyle</div>
+                <div class="progress-label">Additional</div>
+                <div class="progress-label">Summary</div>
+            </div>
+        </div>
+        <form id="obesity-form">
+            <!-- Step 1: Personal Information -->
+            <div class="form-step" id="step1">
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" name="age" required min="0" max="120">
+                </div>
+                <div class="form-group">
+                    <label for="height">Height (m)</label>
+                    <input type="number" id="height" name="height" step="0.01" required min="0.5" max="2.5">
+                </div>
+                <div class="form-group">
+                    <label for="weight">Weight (kg)</label>
+                    <input type="number" id="weight" name="weight" step="0.1" required min="20" max="300">
+                </div>
+                <div class="form-group">
+                    <label for="family_history">Does your family have a history of overweight?</label>
+                    <select id="family_history" name="family_history" required>
+                        <option value="">Select option</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Step 2: Lifestyle Factors -->
+            <div class="form-step" id="step2" style="display: none;">
+                <div class="form-group">
+                    <label for="favc">Do you consume high-caloric food?</label>
+                    <select id="favc" name="favc" required>
+                        <option value="">Select option</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="fcvc">How frequently do you consume vegetables? (On a scale of 1 to 3)</label>
+                    <select id="fcvc" name="fcvc" required>
+                        <option value="">Select option</option>
+                        <option value="1">1 (Rarely)</option>
+                        <option value="2">2 (Sometimes)</option>
+                        <option value="3">3 (Often)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ncp">How many main meals do you consume per day?</label>
+                    <input type="number" id="ncp" name="ncp" required min="1" max="10">
+                </div>
+                <div class="form-group">
+                    <label for="caec">How frequently do you consume snacks between meals?</label>
+                    <select id="caec" name="caec" required>
+                        <option value="">Select option</option>
+                        <option value="no">No</option>
+                        <option value="Sometimes">Sometimes</option>
+                        <option value="Frequently">Frequently</option>
+                        <option value="Always">Always</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="smoke">Do you smoke?</label>
+                    <select id="smoke" name="smoke" required>
+                        <option value="">Select option</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Step 3: Additional Information -->
+            <div class="form-step" id="step3" style="display: none;">
+                <div class="form-group">
+                    <label for="ch2o">How many liters of water do you consume daily?</label>
+                    <input type="number" id="ch2o" name="ch2o" step="0.1" required min="0" max="10">
+                </div>
+                <div class="form-group">
+                    <label for="scc">Do you monitor your calorie intake?</label>
+                    <select id="scc" name="scc" required>
+                        <option value="">Select option</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="faf">How frequently do you engage in physical activity? (On a scale of 1 to 3)</label>
+                    <select id="faf" name="faf" required>
+                        <option value="">Select option</option>
+                        <option value="1">1 (Rarely)</option>
+                        <option value="2">2 (Sometimes)</option>
+                        <option value="3">3 (Often)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tue">What is your daily device usage duration? (On a scale of 1 to 3)</label>
+                    <select id="tue" name="tue" required>
+                        <option value="">Select option</option>
+                        <option value="1">1 (Low)</option>
+                        <option value="2">2 (Medium)</option>
+                        <option value="3">3 (High)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="calc">Do you consume alcohol?</label>
+                    <select id="calc" name="calc" required>
+                        <option value="">Select option</option>
+                        <option value="no">No</option>
+                        <option value="Sometimes">Sometimes</option>
+                        <option value="Frequently">Frequently</option>
+                        <option value="Always">Always</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mtrans">Primary mode of transportation</label>
+                    <select id="mtrans" name="mtrans" required>
+                        <option value="">Select option</option>
+                        <option value="Automobile">Automobile</option>
+                        <option value="Bike">Bike</option>
+                        <option value="Motorbike">Motorbike</option>
+                        <option value="Public_Transportation">Public Transportation</option>
+                        <option value="Walking">Walking</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Step 4: Summary -->
+            <div class="form-step" id="step4" style="display: none;">
+                <h2>Summary</h2>
+                <p>Here is a summary of your input data. Please review before submitting.</p>
+                <div id="summary-content"></div>
+                <div id="prediction-result"></div>
+            </div>
+
+            <div class="button-group">
+                <button type="button" id="prev-btn" onclick="prevStep()">Previous</button>
+                <button type="button" id="next-btn" onclick="nextStep()">Next</button>
+                <button type="button" id="submit-btn" style="display:none;" onclick="submitForm()">Predict</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const formSteps = document.querySelectorAll(".form-step");
+        const nextBtn = document.getElementById("next-btn");
+        const prevBtn = document.getElementById("prev-btn");
+        const submitBtn = document.getElementById("submit-btn");
+        const progressSteps = document.querySelectorAll(".progress-step");
+        const form = document.getElementById("obesity-form");
+    
+        function showStep(step) {
+            formSteps.forEach((formStep, index) => {
+                formStep.style.display = (index === step - 1) ? "block" : "none";
+            });
+    
+            progressSteps.forEach((progressStep, index) => {
+                progressStep.classList.toggle("active", index < step);
+            });
+    
+            prevBtn.style.display = (step === 1) ? "none" : "inline-block";
+            
+            nextBtn.style.display = (step === formSteps.length) ? "none" : "inline-block";
+            submitBtn.style.display = (step === formSteps.length) ? "inline-block" : "none";
+
+            if (step === formSteps.length) {
+                updateSummary();
+            }
+        }
+    
+        function nextStep() {
+            if (validateStep(currentStep)) {
+                if (currentStep < formSteps.length) {
+                    currentStep++;
+                    showStep(currentStep);
+                }
+            }
+        }
+    
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+    
+        function validateStep(step) {
+            let isValid = true;
+            let inputs;
+    
+            switch (step) {
+                case 1:
+                    inputs = document.querySelectorAll('#step1 input, #step1 select');
+                    inputs.forEach(input => {
+                        if (!input.value) {
+                            isValid = false;
+                            showError(input, 'This field is required');
+                        } else if (input.id === 'age' && (input.value < 0 || input.value > 120)) {
+                            isValid = false;
+                            showError(input, 'Age must be between 0 and 120');
+                        } else if (input.id === 'height' && (input.value < 0.5 || input.value > 2.5)) {
+                            isValid = false;
+                            showError(input, 'Height must be between 0.5 and 2.5 meters');
+                        } else if (input.id === 'weight' && (input.value < 20 || input.value > 300)) {
+                            isValid = false;
+                            showError(input, 'Weight must be between 20 and 300 kg');
+                        } else {
+                            clearError(input);
+                        }
+                    });
+                    break;
+    
+                case 2:
+                    inputs = document.querySelectorAll('#step2 input, #step2 select');
+                    inputs.forEach(input => {
+                        if (!input.value) {
+                            isValid = false;
+                            showError(input, 'This field is required');
+                        } else if (input.id === 'ncp' && (input.value < 1 || input.value > 10)) {
+                            isValid = false;
+                            showError(input, 'Meals per day must be between 1 and 10');
+                        } else {
+                            clearError(input);
+                        }
+                    });
+                    break;
+    
+                case 3:
+                    inputs = document.querySelectorAll('#step3 input, #step3 select');
+                    inputs.forEach(input => {
+                        if (!input.value) {
+                            isValid = false;
+                            showError(input, 'This field is required');
+                        } else if (input.id === 'ch2o' && (input.value < 0 || input.value > 10)) {
+                            isValid = false;
+                            showError(input, 'Water intake must be between 0 and 10 liters');
+                        } else {
+                            clearError(input);
+                        }
+                    });
+                    break;
+            }
+    
+            return isValid;
+        }
+    
+        function showError(input, message) {
+            clearError(input);
+            const errorElement = document.createElement('div');
+            errorElement.classList.add('error-message');
+            errorElement.textContent = message;
+            input.parentNode.appendChild(errorElement);
+        }
+    
+        function clearError(input) {
+            const errorElement = input.parentNode.querySelector('.error-message');
+            if (errorElement) {
+                errorElement.remove();
+            }
+        }
+
+        function updateSummary() {
+            const summaryContent = document.getElementById("summary-content");
+            const formData = new FormData(form);
+            let summaryHTML = "";
+
+            summaryHTML += "<h3>Personal Information</h3><ul>";
+            summaryHTML += `<li><strong>Gender:</strong> <span>${formData.get("gender")}</span></li>`;
+            summaryHTML += `<li><strong>Age:</strong> <span>${formData.get("age")}</span></li>`;
+            summaryHTML += `<li><strong>Height:</strong> <span>${formData.get("height")} m</span></li>`;
+            summaryHTML += `<li><strong>Weight:</strong> <span>${formData.get("weight")} kg</span></li>`;
+            summaryHTML += `<li><strong>Family History of Overweight:</strong> <span>${formData.get("family_history")}</span></li>`;
+            summaryHTML += "</ul>";
+
+            summaryHTML += "<h3>Lifestyle Factors</h3><ul>";
+            summaryHTML += `<li><strong>High-caloric Food Consumption:</strong> <span>${formData.get("favc")}</span></li>`;
+            summaryHTML += `<li><strong>Vegetable Consumption Frequency:</strong> <span>${formData.get("fcvc")}</span></li>`;
+            summaryHTML += `<li><strong>Number of Main Meals:</strong> <span>${formData.get("ncp")}</span></li>`;
+            summaryHTML += `<li><strong>Snacks Between Meals:</strong> <span>${formData.get("caec")}</span></li>`;
+            summaryHTML += `<li><strong>Smoking:</strong> <span>${formData.get("smoke")}</span></li>`;
+            summaryHTML += "</ul>";
+
+            summaryHTML += "<h3>Additional Information</h3><ul>";
+            summaryHTML += `<li><strong>Daily Water Consumption:</strong> <span>${formData.get("ch2o")} liters</span></li>`;
+            summaryHTML += `<li><strong>Calorie Monitoring:</strong> <span>${formData.get("scc")}</span></li>`;
+            summaryHTML += `<li><strong>Physical Activity Frequency:</strong> <span>${formData.get("faf")}</span></li>`;
+            summaryHTML += `<li><strong>Daily Device Usage Duration:</strong> <span>${formData.get("tue")}</span></li>`;
+            summaryHTML += `<li><strong>Alcohol Consumption:</strong> <span>${formData.get("calc")}</span></li>`;
+            summaryHTML += `<li><strong>Mode of Transportation:</strong> <span>${formData.get("mtrans")}</span></li>`;
+            summaryHTML += "</ul>";
+
+            summaryContent.innerHTML = summaryHTML;
+        }
+    
+        showStep(currentStep);
+
+        function submitForm() {
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultElement = document.getElementById('prediction-result');
+                if (data.error) {
+                    resultElement.innerHTML = `<h3>Error</h3><p>${data.error}</p>`;
+                } else {
+                    resultElement.innerHTML = `<h3>Prediction Result</h3><p>Predicted obesity level: <strong>${data.prediction}</strong></p>`;
+                }
+                resultElement.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("An error occurred while processing your request.");
+            });
+        }
+    </script>
+</body>
+
+</html>
